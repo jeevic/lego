@@ -1,0 +1,10 @@
+.idea
+.vscode
+.DS_Store
+*.swp
+*.swo
+
+
+test/tmp/
+
+vendor

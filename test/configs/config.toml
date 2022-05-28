@@ -1,0 +1,87 @@
+# @see  https://github.com/toml-lang/toml
+#app配置项
+[app]
+name = "indexer"
+time_zone = "Asia/Shanghai"
+pidfile = "./indexer.pid"
+request_id = ""
+
+[httpserver]
+http_host = "0.0.0.0"
+http_port = 8012
+enable_https = false
+middleware = ["cors", "requestid", "ydlogger"]
+[grpcserver]
+grpc_host = "0.0.0.0"
+grpc_port = 8013
+
+[log]
+type = "multi"
+[log.instance.app]
+path = "./logs/"
+filename = "app.log"
+errfilename = "error.log"
+format = "ydLog"
+level = "debug"
+split = ".%Y%m%d%H"
+lifetime = 240
+rotation = 24
+[log.instance.app1]
+path = "./logs/"
+filename = "app.log"
+errfilename = "error.log"
+format = "ydLog"
+level = "debug"
+split = ".%Y%m%d%H"
+lifetime = 240
+rotation = 24
+[mongo]
+type = "multi"
+[mongo.instance.db1]
+hosts = "10.103.17.53:27001,10.103.17.53:27002,10.103.17.53:27003"
+replset = "image"
+max_pool_size = 100
+min_pool_size = 10
+max_idle_time = 5
+read_preference = "secondaryPreferred"
+
+[crontab]
+enable = true
+
+[pprof]
+enable = true
+
+[zookeeper]
+hosts = ["10.103.17.53:2181"]
+session_timeout = 50
+base_path = "/contech/github.com/jeevic/lego-develop"
+[kafka]
+[producer]
+type = "multi"
+[kafka.producer.pipeline]
+host = "10.103.17.53:9092"
+topic = "test"
+timeout = 5
+return_success = true
+required_acks = 0
+[consumer]
+type = "multi"
+[kafka.consumer.pipeline]
+host = "10.103.17.53:9092"
+topic = "test"
+return_success = true
+[redis]
+type = "multi"
+[redis.instance.db1]
+redis_type = "cluser"
+hosts = "10.103.17.53:6379,10.103.17.53:6380,10.103.17.53:6381,10.103.17.53:6382,10.103.17.53:6383,10.103.17.53:6384"
+max_pool_size = 100
+min_pool_size = 10
+max_idle_time = 5
+[redis.instance.db2]
+redis_type = "masterSlave"
+master = "10.103.17.53:6385"
+slaves = "10.103.17.53:6386,10.103.17.53:6387"
+max_pool_size = 100
+min_pool_size = 10
+max_idle_time = 5
