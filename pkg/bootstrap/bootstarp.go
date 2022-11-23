@@ -1,4 +1,4 @@
-package bootstarp
+package bootstrap
 
 import "github.com/jeevic/lego/pkg/app"
 
@@ -18,7 +18,7 @@ func Start() {
 	}
 }
 
-//关闭服务
+// 关闭服务
 func Stop(stop bool) {
 	Shutdown()
 	if stop == true {

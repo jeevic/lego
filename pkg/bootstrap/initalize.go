@@ -1,4 +1,4 @@
-package bootstarp
+package bootstrap
 
 import (
 	"errors"
@@ -36,7 +36,7 @@ var initFunc = []func(){
 	InitSwagger,
 }
 
-//初始化函数
+// 初始化函数
 func Init() error {
 	t1 := time.Now()
 	for _, f := range initFunc {
@@ -52,12 +52,12 @@ func Init() error {
 	return nil
 }
 
-//注册初始化函数
+// 注册初始化函数
 func RegisterInit(f func()) {
 	initFunc = append(initFunc, f)
 }
 
-//注册http route
+// 注册http route
 func RegisterHttpRoutes(f func(engine *gin.Engine)) error {
 	hs, _ := app.App.GetHttpServer()
 	if hs == nil {
@@ -67,12 +67,12 @@ func RegisterHttpRoutes(f func(engine *gin.Engine)) error {
 	return nil
 }
 
-//注册信号监听函数
+// 注册信号监听函数
 func RegisterSignalFunc(f sig.CallbackSignal) {
 	sig.AddWatchFunc(f)
 }
 
-//初始化配置
+// 初始化配置
 func InitConfig() {
 	cfg, err := app.App.GetCfgFile()
 	if err != nil {
@@ -88,8 +88,8 @@ func InitConfig() {
 	app.App.SetConfig(c)
 }
 
-//初始化日志 -- 核心加载
-//TODO 是否可以改成懒加载
+// 初始化日志 -- 核心加载
+// TODO 是否可以改成懒加载
 func InitLog() {
 	cfg := app.App.GetConfiger()
 	//多实例
@@ -137,7 +137,7 @@ func InitLog() {
 	app.App.GetLogger().Info("[init] log component complete !")
 }
 
-//初始化app
+// 初始化app
 func InitApp() {
 	cfg := app.App.GetConfiger()
 	name := cfg.GetString("app.name")
@@ -160,7 +160,7 @@ func InitApp() {
 	app.App.GetLogger().Info("[init] app init complete !")
 }
 
-//pid设置
+// pid设置
 func InitPid() {
 	pid := os.Getpid()
 	pidfile := app.App.GetConfiger().GetString("app.pidfile")
@@ -192,7 +192,7 @@ func InitSwagger() {
 	}
 }
 
-//初始化server
+// 初始化server
 func InitHttpServer() {
 	cfg := app.App.GetConfiger()
 	if !cfg.IsSet("httpserver.http_host") {
@@ -243,7 +243,7 @@ func InitHttpServer() {
 	app.App.GetLogger().Info("[init] http server complete!")
 }
 
-//grpc server
+// grpc server
 func InitGrpcServer() {
 	cfg := app.App.GetConfiger()
 	if !cfg.IsSet("grpcserver.grpc_host") {
