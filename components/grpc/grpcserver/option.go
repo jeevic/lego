@@ -69,6 +69,14 @@ type Options struct {
 	//@see https://github.com/grpc/grpc-go/tree/master/examples/features/interceptor
 	UnaryInterceptors  []grpc.UnaryServerInterceptor
 	StreamInterceptors []grpc.StreamServerInterceptor
+
+	//https://pkg.go.dev/google.golang.org/grpc#WithInitialConnWindowSize
+	InitialConnWindowSize int32
+
+	InitialWindowSize int32
+
+	//是否是unix socket 通信
+	UnixSocket bool
 }
 
 func NewOptions(options ...Option) *Options {
@@ -79,7 +87,7 @@ func NewOptions(options ...Option) *Options {
 	return opts
 }
 
-//@see https://pkg.go.dev/google.golang.org/grpc/keepalive
+// @see https://pkg.go.dev/google.golang.org/grpc/keepalive
 func WithKeepaliveEnforcementPolicyMinTime(t time.Duration) Option {
 	return func(o *Options) {
 		o.KeepaliveEnforcementPolicyMinTime = t
@@ -154,6 +162,24 @@ func WithAppendStreamInterceptor(intercepter grpc.StreamServerInterceptor) Optio
 			o.StreamInterceptors = make([]grpc.StreamServerInterceptor, 0, 1)
 		}
 		o.StreamInterceptors = append(o.StreamInterceptors, intercepter)
+	}
+}
+
+func WithInitialWindowSize(s int32) Option {
+	return func(options *Options) {
+		options.InitialWindowSize = s
+	}
+}
+
+func WithInitialConnWindowSize(s int32) Option {
+	return func(options *Options) {
+		options.InitialConnWindowSize = s
+	}
+}
+
+func WithUnixSocket(b bool) Option {
+	return func(options *Options) {
+		options.UnixSocket = b
 	}
 }
 

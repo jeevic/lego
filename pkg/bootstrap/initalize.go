@@ -249,8 +249,9 @@ func InitGrpcServer() {
 	if !cfg.IsSet("grpcserver.grpc_host") {
 		return
 	}
-	host := cfg.GetString("grpcserver.grpc_host")
-	port := cfg.GetInt("grpcserver.grpc_port")
+	if !cfg.IsSet("grpcserver.grpc_host") && !cfg.IsSet("grpcserver.grpc_unix_domain") {
+		return
+	}
 
 	options := make([]grpcserver.Option, 0, 10)
 
@@ -334,7 +335,18 @@ func InitGrpcServer() {
 	options = append(options, grpcserver.WithAppendUnaryInterceptor(grpc_ratelimiter.RateLimiterUnaryServerInterceptor()))
 	options = append(options, grpcserver.WithAppendStreamInterceptor(grpc_ratelimiter.RateLimiterStreamServerInterceptor()))
 
-	target := fmt.Sprintf("%s:%d", host, port)
+	// options = append(options, grpcserver.WithInitialWindowSize(1024*1024*1024))
+	// options = append(options, grpcserver.WithInitialConnWindowSize(1024*1024*1024))
+
+	var target string
+	if cfg.IsSet("grpcserver.grpc_host") {
+		host := cfg.GetString("grpcserver.grpc_host")
+		port := cfg.GetInt("grpcserver.grpc_port")
+		target = fmt.Sprintf("%s:%d", host, port)
+	} else {
+		target = cfg.GetString("grpcserver.grpc_unix_domain")
+		options = append(options, grpcserver.WithUnixSocket(true))
+	}
 
 	gs, err := grpcserver.NewGrpcServer(target, options...)
 	if err != nil {

@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
@@ -56,6 +57,14 @@ func NewGrpcServer(target string, options ...Option) (*GrpcServer, error) {
 		srvOptions = append(srvOptions, grpc.ChainStreamInterceptor(opts.StreamInterceptors...))
 	}
 
+	if opts.InitialWindowSize > 0 {
+		srvOptions = append(srvOptions, grpc.InitialWindowSize(opts.InitialWindowSize))
+	}
+
+	if opts.InitialConnWindowSize > 0 {
+		srvOptions = append(srvOptions, grpc.InitialConnWindowSize(opts.InitialConnWindowSize))
+	}
+
 	s := &GrpcServer{}
 	s.option = opts
 	s.Server = grpc.NewServer(srvOptions...)
@@ -64,7 +73,7 @@ func NewGrpcServer(target string, options ...Option) (*GrpcServer, error) {
 
 }
 
-//register server
+// register server
 func (s *GrpcServer) RegisterService(f func(s *grpc.Server, srv interface{}), ss interface{}) {
 	f(s.Server, ss)
 }
@@ -73,10 +82,26 @@ func (s *GrpcServer) Run() error {
 	//reflection for query api
 	reflection.Register(s.Server)
 
-	lis, err := net.Listen("tcp", s.target)
-	if err != nil {
-		return err
+	var lis net.Listener
+	var err error
+	if s.option.UnixSocket {
+		_ = os.Remove(s.target)
+		unixAddr, err := net.ResolveUnixAddr("unix", s.target)
+		if err != nil {
+			return err
+		}
+		lis, err = net.ListenUnix("unix", unixAddr)
+		if err != nil {
+			return err
+		}
+
+	} else {
+		lis, err = net.Listen("tcp", s.target)
+		if err != nil {
+			return err
+		}
 	}
+
 	err = s.Server.Serve(lis)
 	if err != nil {
 		return err
